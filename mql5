@@ -1,0 +1,45 @@
+
+//+------------------------------------------------------------------+
+//|                                                Cycle Sniper MT5   |
+//|                                  Developed by Forex Robot Easy Team|
+//|                                       Website: forexroboteasy.com |
+//+------------------------------------------------------------------+
+
+//--- Include necessary libraries
+#include <Trade\Trade.mqh>
+#include <Technical\Indicators\Indicators.mqh>
+
+//--- Define input parameters for the trading robot
+input double StopLoss=100.0;      // Stop loss level in pips
+input double TakeProfit=200.0;    // Take profit level in pips
+input int TradeVolume=0.1;        // Trading volume in lots
+
+//--- Define the trading function
+void OnTick()
+{
+   //--- Calculate the cycle indicators
+   double cycleIndicator1=iCustom(_Symbol, PERIOD_CURRENT, 'CycleIndicator1', 0);
+   double cycleIndicator2=iCustom(_Symbol, PERIOD_CURRENT, 'CycleIndicator2', 0);
+   
+   //--- Check if cycle indicators are valid
+   if(cycleIndicator1!=0 && cycleIndicator2!=0)
+   {
+      //--- Open a buy trade if cycle indicators are positive
+      if(cycleIndicator1>0 && cycleIndicator2>0)
+      {
+         double entryPrice=Ask;
+         double stopLoss=entryPrice-StopLoss*_Point;
+         double takeProfit=entryPrice+TakeProfit*_Point;
+         Trade.Buy(TradeVolume, entryPrice, stopLoss, takeProfit);
+      }
+      
+      //--- Open a sell trade if cycle indicators are negative
+      if(cycleIndicator1<0 && cycleIndicator2<0)
+      {
+         double entryPrice=Bid;
+         double stopLoss=entryPrice+StopLoss*_Point;
+         double takeProfit=entryPrice-TakeProfit*_Point;
+         Trade.Sell(TradeVolume, entryPrice, stopLoss, takeProfit);
+      }
+   }
+}
